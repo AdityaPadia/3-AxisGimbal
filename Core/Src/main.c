@@ -93,6 +93,14 @@ int16_t Gyro_X_RAW = 0;
 int16_t Gyro_Y_RAW = 0;
 int16_t Gyro_Z_RAW = 0;
 
+int16_t Accel_X_Error = 0;
+int16_t Accel_Y_Error = 0;
+int16_t Accel_Z_Error = 0;
+
+int16_t Gyro_X_Error = 0;
+int16_t Gyro_Y_Error = 0;
+int16_t Gyro_Z_Error = 0;
+
 float Ax, Ay, Az, Gx, Gy, Gz;
 
 uint32_t timer;
@@ -186,6 +194,74 @@ void MPU6050_Read_Gyro(void)
 	Gx = Gyro_X_RAW/131.0;
 	Gy = Gyro_Y_RAW/131.0;
 	Gz = Gyro_Z_RAW/131.0;
+}
+
+void MPU6050_ReadAccelError(void)
+{
+	uint8_t Rec_Data[6];
+
+		// Read 6 BYTES of data starting from ACCEL_XOUT_H register
+		HAL_I2C_Mem_Read(&hi2c2, MPU6050_ADDR, ACCEL_XOUT_REG, 1, Rec_Data, 6, 1000);
+
+		Accel_X_Error = (int16_t)(Rec_Data[0] << 8 | Rec_Data[1]);
+		Accel_Y_Error = (int16_t)(Rec_Data[2] << 8 | Rec_Data[3]);
+		Accel_Z_Error = (int16_t)(Rec_Data[4] << 8 | Rec_Data[5]);
+
+		for (int i = 0; i < 200; i++)
+		{
+			HAL_I2C_Mem_Read(&hi2c2, MPU6050_ADDR, ACCEL_XOUT_REG, 1, Rec_Data, 6, 1000);
+
+			Accel_X_Error += (int16_t)(Rec_Data[0] << 8 | Rec_Data[1]);
+			Accel_Y_Error += (int16_t)(Rec_Data[2] << 8 | Rec_Data[3]);
+			Accel_Z_Error += (int16_t)(Rec_Data[4] << 8 | Rec_Data[5]);
+			HAL_Delay(100);
+		}
+
+		Accel_X_Error = Accel_X_Error/200;
+		Accel_Y_Error = Accel_Y_Error/200;
+		Accel_Z_Error = Accel_Z_Error/200;
+
+		// Converting RAW values into acceleration in g
+		// We have to divide according to the Full scale value set in FS_SEL
+
+		Accel_X_Error = Accel_X_Error/16484.0;
+		Accel_Y_Error = Accel_Y_Error/16484.0;
+		Accel_Z_Error = Accel_Z_Error/16484.0;
+}
+
+void MPU6050_ReadGryoError(void)
+{
+	uint8_t Rec_Data[6];
+
+		// Read 6 BYTES of data starting from GYRO_XOUT_H register
+		HAL_I2C_Mem_Read(&hi2c2, MPU6050_ADDR, GYRO_XOUT_H_REG, 1, Rec_Data, 6, 1000);
+
+		Gyro_X_Error = (int16_t)(Rec_Data[0] << 8 | Rec_Data[1]);
+		Gyro_Y_Error = (int16_t)(Rec_Data[2] << 8 | Rec_Data[3]);
+		Gyro_Z_Error = (int16_t)(Rec_Data[4] << 8 | Rec_Data[5]);
+
+		for (int i = 0; i < 200; i++)
+		{
+			HAL_I2C_Mem_Read(&hi2c2, MPU6050_ADDR, GYRO_XOUT_H_REG, 1, Rec_Data, 6, 1000);
+
+			Gyro_X_Error += (int16_t)(Rec_Data[0] << 8 | Rec_Data[1]);
+			Gyro_Y_Error += (int16_t)(Rec_Data[2] << 8 | Rec_Data[3]);
+			Gyro_Z_Error += (int16_t)(Rec_Data[4] << 8 | Rec_Data[5]);
+
+			HAL_Delay(100);
+		}
+
+		Gyro_X_Error = Gyro_X_Error/200;
+		Gyro_Y_Error = Gyro_Y_Error/200;
+		Gyro_Z_Error = Gyro_Z_Error/200;
+
+		//Converting RAW  values to degree per second
+		// We have to divide according to the full scale value set in FS_SEL
+
+		Gyro_X_Error = Gyro_X_Error/131.0;
+		Gyro_Y_Error = Gyro_Y_Error/131.0;
+		Gyro_Z_Error = Gyro_Z_Error/131.0;
+
 }
 
 double Kalman_getAngle(Kalman_t *Kalman, double newAngle, double newRate, double dt)
@@ -371,7 +447,7 @@ int main(void)
 		  LCD_DrawString(90,90, buf);
 
 
-		  HAL_Delay(250);
+		  HAL_Delay(100);
 
 	  }
 	  /* USER CODE END 3 */

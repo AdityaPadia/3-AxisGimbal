@@ -27,23 +27,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000029  00000000  00000000  0002026c  2**0
                   CONTENTS, READONLY
- 12 .debug_info   0000910b  00000000  00000000  00020295  2**0
+ 12 .debug_info   000091ff  00000000  00000000  00020295  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00001af4  00000000  00000000  000293a0  2**0
+ 13 .debug_abbrev 00001ad6  00000000  00000000  00029494  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 000009a8  00000000  00000000  0002ae98  2**3
+ 14 .debug_aranges 000009b8  00000000  00000000  0002af70  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_ranges 000008e8  00000000  00000000  0002b840  2**3
+ 15 .debug_ranges 000008f8  00000000  00000000  0002b928  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  0001a994  00000000  00000000  0002c128  2**0
+ 16 .debug_macro  0001a994  00000000  00000000  0002c220  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0000b79a  00000000  00000000  00046abc  2**0
+ 17 .debug_line   0000b9ac  00000000  00000000  00046bb4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    00096912  00000000  00000000  00052256  2**0
+ 18 .debug_str    00096990  00000000  00000000  00052560  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  000e8b68  2**0
+ 19 .comment      00000050  00000000  00000000  000e8ef0  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000039f0  00000000  00000000  000e8bb8  2**2
+ 20 .debug_frame  00003a40  00000000  00000000  000e8f40  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -2160,6 +2160,9 @@ void MPU6050_Read_Gyro(void)
  80013f0:	20000348 	.word	0x20000348
 
 080013f4 <Kalman_getAngle>:
+		Gyro_Z_Error = Gyro_Z_Error/131.0;
+
+}
 
 double Kalman_getAngle(Kalman_t *Kalman, double newAngle, double newRate, double dt)
 {
