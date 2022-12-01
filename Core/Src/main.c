@@ -126,6 +126,7 @@ Kalman_t KalmanY = {
 
 double KalmanAngleX;
 double KalmanAngleY;
+double KalmanAngleZ;
 
 void MPU6050_Init(void)
 {
@@ -364,6 +365,12 @@ void MPU6050_Read_All()
 	}
 
 	KalmanAngleX = Kalman_getAngle(&KalmanX, roll, Gx, dt);
+
+	double yaw = 0;
+	yaw += Gz/dt;
+
+	KalmanAngleZ = yaw;
+
 }
 
 
